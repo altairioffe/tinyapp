@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/altairioffe/tinyapp/issues"
   },
-  "homepage": "https://github.com/altairioffe/tinyapp#readme"
+  "homepage": "https://github.com/altairioffe/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
