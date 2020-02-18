@@ -45,15 +45,27 @@ app.get ("/urls", (req, res) => {
 
 
 app.get("/urls/:shortURL", (req, res) => {
-
-  let templateVars = {shortURL: req.params.shortURL, longURL: urlDataBase.shortURL};
+  const shortURL = req.params.shortURL
+  let templateVars = {shortURL: shortURL, longURL: urlDataBase[shortURL]};
+  log(1, templateVars)
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  log(req.body);
-  res.send('okie dokie')
-})
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  const redirect = `/urls/${shortURL}`
+  urlDataBase[shortURL] = longURL;
+  log(urlDataBase)
+  res.redirect(redirect)
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL
+  const longURL = urlDataBase[shortURL];
+  log(urlDataBase);
+  res.redirect(longURL);
+});
 
 app.listen(PORT, () => {
   log(`Example app listening on port ${PORT}`);
