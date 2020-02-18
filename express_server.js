@@ -4,6 +4,7 @@ app.set("view engine", "ejs");
 const PORT = 8080;
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: true}));
+
 const log = console.log;
 
 const generateRandomString = function() {
@@ -47,23 +48,27 @@ app.get ("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL
   let templateVars = {shortURL: shortURL, longURL: urlDataBase[shortURL]};
-  log(1, templateVars)
   res.render("urls_show", templateVars);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL
+  delete urlDataBase[shortURL];
+  res.redirect("/urls")
+})
+
 app.post("/urls", (req, res) => {
+ 
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   const redirect = `/urls/${shortURL}`
   urlDataBase[shortURL] = longURL;
-  log(urlDataBase)
   res.redirect(redirect)
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL
   const longURL = urlDataBase[shortURL];
-  log(urlDataBase);
   res.redirect(longURL);
 });
 
