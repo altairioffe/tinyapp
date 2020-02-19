@@ -22,7 +22,7 @@ const generateRandomString = function() {
 
 const urlDataBase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.getindezone.com"
 };
 
 //const userName = {}
