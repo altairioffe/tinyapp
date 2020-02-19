@@ -13,14 +13,14 @@
     </div>
 
     <div class="align-self-end">
-      <% if(!userId){ %>
+      <% if(!user){ %>
       <form class="form-inline" action="/registration">
         <div class="form-group mb-2"></div>
  
         <button type="submit" class="btn btn-primary">login / register</button>
       </form>
       <% } else{ %>
-        <p><%-userId-%></p>
+        <p><%-user.email-%></p>
         <form class="form-inline" action="/logout" method="POST">
           <div class="form-group mb-2"></div>
           <button type="logout" class="btn btn-primary">logout</button>

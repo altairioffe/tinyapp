@@ -50,13 +50,10 @@ const findIdFromEmail = function(email, password) {
 
 //console.log(findIdFromEmail('sample@email.com', 'sneaky'))
 
-
-
-
 app.get("/registration", (req, res) => {
   let userId = req.cookies.userId
 
-  let templateVars = { urls: urlDataBase, userId: userId };
+  let templateVars = { urls: urlDataBase, user: users.userId };
  // log(email)
   res.render('registration', templateVars);
 });
@@ -70,8 +67,6 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   let id = findIdFromEmail(email, password);
 
-
-  
   if (id) {
     res.cookie("userId", id);
     res.redirect("/urls");
@@ -86,14 +81,13 @@ app.post("/logout", (req, res) => {
   res.redirect("/registration");
 });
 
-
 app.get("/hello", (req, res) => {
   res.send("<html><body> Greetings, <b>cyber</b>traveller</body></html>\n");
 });
 
 app.get("/urls/new", (req, res) => {
   let userId = req.cookies.userId
-  let templateVars = { userId: userId };
+  let templateVars = { user: users[userId] };
   //log(email)
 
   res.render("urls_new", templateVars);
@@ -103,14 +97,15 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   log(req.cookies.userId)
   let userId = req.cookies.userId
+  log(users.userId)
   //log(users[id])
-  let email;
+  //let email;
   // users.id.email ? email = users[id].email : email = '';
   // log(email)
-  let templateVars = { urls: urlDataBase, userId: userId};
+  let templateVars = { urls: urlDataBase, user: users[userId] };
+  //log(users[userId].email)
   res.render("urls_index", templateVars);
 });
-
 
 app.post("/register", (req, res) => {
 
@@ -128,15 +123,16 @@ app.post("/register", (req, res) => {
     password
   };
   res.cookie('userId', userId);
-  let templateVars = { urls: urlDataBase, userId: userId };
+  let templateVars = { urls: urlDataBase, user: users[userId] };
+  log(users[userId].email)
   res.redirect("/urls");
 });
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  c
+  let userId = req.cookies.userId
   const shortURL = req.params.shortURL;
-  let templateVars = { shortURL: shortURL, longURL: urlDataBase[shortURL], email: req.cookies.email };
+  let templateVars = { shortURL: shortURL, longURL: urlDataBase[shortURL], user: users[userId] };
   res.render("urls_show", templateVars);
 });
 
