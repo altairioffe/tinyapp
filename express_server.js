@@ -25,8 +25,26 @@ const urlDataBase = {
   "9sm5xK": "http://www.getindezone.com"
 };
 
+
+
+const users = {
+  "user1Id": {
+    id: "user1Id",
+    email: "sample@email.com",
+    password: "sneaky" 
+  },
+  "user2Id": {
+    id: "use21Id",
+    email: "sample2@email.com",
+    password: "sneaky" 
+  }
+
+};
+
+
 app.get("/", (req, res) => {
-  res.send('GREETINGS');
+  let templateVars = { urls: urlDataBase, username: req.cookies.username };
+  res.render('registration', templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
@@ -64,9 +82,12 @@ app.get("/urls", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = { urls: urlDataBase, username: req.cookies.username };
   res.render("registration", templateVars);
-})
+});
 
-app.get("/urls/:shortURL", (req, res) => {
+
+
+
+app.get("/urls/:shortURL", (req, res) => {c
   const shortURL = req.params.shortURL;
   let templateVars = { shortURL: shortURL, longURL: urlDataBase[shortURL], username: req.cookies.username };
   res.render("urls_show", templateVars);
@@ -84,8 +105,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDataBase[shortURL];
   res.redirect("/urls");
 });
-
-
 
 app.post("/urls", (req, res) => {
 
