@@ -22,7 +22,10 @@
       </form>
       <% } else{ %>
         <p><%-username-%></p>
-        <button type="logout" class="btn btn-primary" action="/logout" method="POST">logout</button>
+        <form class="form-inline" action="/logout" method="POST">
+          <div class="form-group mb-2"></div>
+          <button type="logout" class="btn btn-primary">logout</button>
+        </form>
       <% } %>
     </div>
 
