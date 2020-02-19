@@ -13,15 +13,14 @@
     </div>
 
     <div class="align-self-end">
-      <% if(!username){ %>
-      <form class="form-inline" action="/login" method="POST">
+      <% if(!userId){ %>
+      <form class="form-inline" action="/registration">
         <div class="form-group mb-2"></div>
-        <input class="form-control" type="text" name="username" placeholder="username"
-          style="width: 150px; margin: 1em">
-        <button type="submit" class="btn btn-primary">login</button>
+ 
+        <button type="submit" class="btn btn-primary">login / register</button>
       </form>
       <% } else{ %>
-        <p><%-username-%></p>
+        <p><%-userId-%></p>
         <form class="form-inline" action="/logout" method="POST">
           <div class="form-group mb-2"></div>
           <button type="logout" class="btn btn-primary">logout</button>
