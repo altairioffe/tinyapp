@@ -18,7 +18,7 @@ const generateRandomString = function() {
     random.push(characters[(Math.floor(Math.random() * 6))]);
   }
   return random.join('');
-}
+};
 
 const urlDataBase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -61,6 +61,10 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.get("/register", (req, res) => {
+  let templateVars = { urls: urlDataBase, username: req.cookies.username };
+  res.render("registration", templateVars);
+})
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
@@ -79,12 +83,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL
   delete urlDataBase[shortURL];
   res.redirect("/urls");
-})
+});
+
+
 
 app.post("/urls", (req, res) => {
 
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password
+  log(email, password);
+
   const redirect = `/urls/${shortURL}`;
   urlDataBase[shortURL] = longURL;
   res.redirect(redirect);
