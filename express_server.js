@@ -95,8 +95,12 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let userId = req.cookies.userId;
+  if (!userId) {
+    res.redirect("/registration")
+  } else {
   let templateVars = { user: users[userId] };
   res.render("urls_new", templateVars);
+  }
 });
 
 
