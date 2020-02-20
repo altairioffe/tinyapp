@@ -6,20 +6,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cookieSession = require("cookie-session");
-app.use(cookieSession({name: 'session', keys: ['ghfjhgf'] }));
+app.use(cookieSession({ name: 'session', keys: ['ghfjhgf'] }));
 
 const bcrypt = require("bcrypt");
 
 app.use((req, res, next) => {
   const userId = req.session.userId;
-  console.log('user id: ', req.session)
   const user = users[userId];
   const userLinks = urlsForUserId(userId);
-  
+
   req.user = user;
   res.locals.user = user;
   res.locals.urls = userLinks;
-
+ //log(user)
   next();
 });
 
@@ -100,8 +99,6 @@ const createUser = function(req, res) {
       hashedPassword,
     };
     req.session.userId = userId;
-    console.log('create', req.session.userId)
-    log(users[userId]);
     res.redirect("/urls");
   };
 }
@@ -139,15 +136,13 @@ app.post("/logout", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let userId = req.session.userId;
   if (!userId) {
-    res.redirect("/registration")
+    res.redirect("/registration");
   } else {
     res.render("urls_new");
   }
 });
 
 app.get("/urls", (req, res) => {
-  console.log('urls log: ', req.session.user_id)
-
   res.render("urls_index");
 });
 
@@ -182,11 +177,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //CREATE NEW SHORT URL
 app.post("/urls", (req, res) => {
-
+  
+  let userId = req.session.userId;
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  let userId = req.session.userId;
-  //const redirect = `/urls/${shortURL}`;
   urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
   res.redirect("/urls");
 });
