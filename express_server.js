@@ -1,3 +1,6 @@
+const helpers = require('./helpers.js');
+const {generateRandomString, doesEmailExist, findIdFromEmail} = helpers;
+
 const express = require('express');
 const app = express();
 app.set("view engine", "ejs");
@@ -13,12 +16,11 @@ const bcrypt = require("bcrypt");
 app.use((req, res, next) => {
   const userId = req.session.userId;
   const user = users[userId];
-  const userLinks = urlsForUserId(userId);
+  const userLinks = findUrlsForUserId(userId);
 
   req.user = user;
   res.locals.user = user;
   res.locals.urls = userLinks;
- //log(user)
   next();
 });
 
@@ -43,36 +45,36 @@ const users = {
   }
 };
 
-const generateRandomString = function() {
-  let random = [];
-  let characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  for (let i = 0; i < 6; i++) {
-    random.push(characters[(Math.floor(Math.random() * 19))]);
-  }
-  return random.join('');
-};
+// const generateRandomString = function() {
+//   let random = [];
+//   let characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 1, 2, 3, 4, 5, 6, 7, 8, 9];
+//   for (let i = 0; i < 6; i++) {
+//     random.push(characters[(Math.floor(Math.random() * 19))]);
+//   }
+//   return random.join('');
+// };
 
-const doesEmailExist = function(email) {
-  let foundEmail;
-  for (let key in users) {
-    if (users[key].email === email) {
-      return foundEmail = true;
-    }
-  }
-  return foundEmail || false;
-};
+// const doesEmailExist = function(email, users) {
+//   let foundEmail;
+//   for (let key in users) {
+//     if (users[key].email === email) {
+//       return foundEmail = true;
+//     }
+//   }
+//   return foundEmail || false;
+// };
 
-const findIdFromEmail = function(email, password) {
-  let foundId;
-  for (let key in users) {
-    if (users[key].email === email && bcrypt.compare(password, users[key].hashedPassword)) {
-      return foundId = key;
-    }
-  }
-  return foundId || false;
-};
+// const findIdFromEmail = function(email, password) {
+//   let foundId;
+//   for (let key in users) {
+//     if (users[key].email === email && bcrypt.compare(password, users[key].hashedPassword)) {
+//       return foundId = key;
+//     }
+//   }
+//   return foundId || false;
+// };
 
-const urlsForUserId = function(userId) {
+const findUrlsForUserId = function(userId) {
   let userLinks = {};
   for (let link in urlDataBase) {
     if (urlDataBase[link].userId === userId) {
@@ -87,7 +89,7 @@ const createUser = function(req, res) {
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  if (!email || !password || doesEmailExist(email)) {
+  if (!email || !password || doesEmailExist(email, users)) {
     res.status(400);
     res.redirect("/registration");
   } else {
@@ -101,7 +103,7 @@ const createUser = function(req, res) {
     req.session.userId = userId;
     res.redirect("/urls");
   };
-}
+};
 
 app.get("/registration", (req, res) => {
   res.render('registration');
@@ -114,7 +116,7 @@ app.get("/urls.json", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  let userId = findIdFromEmail(email, password);
+  let userId = findIdFromEmail(email, password, users);
 
   if (userId) {
     req.session.userId = userId;
@@ -130,8 +132,6 @@ app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/registration");
 });
-
-
 
 app.get("/urls/new", (req, res) => {
   let userId = req.session.userId;
