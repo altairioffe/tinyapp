@@ -8,6 +8,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const cookieParser = require("cookie-parser");
 app.use(cookieParser())
 
+const bcrypt = require("bcrypt");
+
 const PORT = 8080;
 const log = console.log;
 
@@ -51,7 +53,7 @@ const doesEmailExist = function(email) {
 const findIdFromEmail = function(email, password) {
   let foundId;
   for (let key in users) {
-    if (users[key].email === email && users[key].password === password) {
+    if (users[key].email === email &&  bcrypt.compare(password, users[key].hashedPassword)) {
       return foundId = key;
     }
   }
@@ -71,8 +73,9 @@ const urlsForUserId = function(userId) {
 const createUser = function(req, res) {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
-  if (!(email || password) || doesEmailExist(email)) {
+  if (!email || !password || doesEmailExist(email)) {
     res.status(400);
     res.redirect("/registration");
   } else {
@@ -81,16 +84,16 @@ const createUser = function(req, res) {
     users[userId] = {
       userId,
       email,
-      password
+      hashedPassword,
     };
     res.cookie('userId', userId);
     let templateVars = { urls: urlDataBase, user: users[userId] };
-  //  log(users[userId].email);
+    log(users[userId]);
     res.redirect("/urls");
   };
 }
 
-console.log(urlsForUserId('user1Id'))
+//console.log(urlsForUserId('user1Id'))
 
 app.get("/registration", (req, res) => {
   let userId = req.cookies.userId;
