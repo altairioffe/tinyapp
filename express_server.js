@@ -100,17 +100,12 @@ app.post("/logout", (req, res) => {
   res.redirect("/registration");
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body> Greetings, <b>cyber</b>traveller</body></html>\n");
-});
-
 app.get("/urls/new", (req, res) => {
   let userId = req.cookies.userId;
 
   if (!userId) {
     res.redirect("/registration")
   } else {
-
     let templateVars = { user: users[userId] };
     res.render("urls_new", templateVars);
   }
@@ -149,16 +144,25 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+
   let userId = req.cookies.userId;
-  const shortURL = req.params.shortURL;
-  let templateVars = { shortURL: shortURL, longURL: urlDataBase[shortURL], user: users[userId] };
+  let userLinks = urlsForUserId(userId)
+  let longURL = urlDataBase.shortURL;
+  let shortURL = req.params.shortURL;
+  let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
   res.render("urls_show", templateVars);
 });
+/////
 
 app.post("/urls/:shortURL/update", (req, res) => {
+  let userId = req.cookies.userId;
   const shortURL = req.params.shortURL;
   const newURL = req.body.newURL;
-  urlDataBase[shortURL] = newURL;
+  let userLinks = urlsForUserId(userId)
+
+  log(newURL)
+  urlDataBase[shortURL] = { 'longURL': newURL, 'userId': userId };  
+  log(userLinks)
   res.redirect("/urls");
 });
 
@@ -179,7 +183,7 @@ app.post("/urls", (req, res) => {
 
   const redirect = `/urls/${shortURL}`;
   urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
-  res.redirect(redirect);
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
