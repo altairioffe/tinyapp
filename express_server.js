@@ -38,14 +38,24 @@ const users = {
   }
 };
 
-const findIdFromEmail = function(email, password) {
-  let foundEmail;
+const doesEmailExist = function(email) {
+  let result;
   for (let key in users) {
-    if (users[key].email === email && users[key].password === password) {
-      return foundEmail = key;
+    if (users[key].email === email) {
+      return result = true;
     }
   }
-  return foundEmail || false;
+  return result || false;
+}
+
+const findIdFromEmail = function(email, password) {
+  let foundId;
+  for (let key in users) {
+    if (users[key].email === email && users[key].password === password) {
+      return foundId = key;
+    }
+  }
+  return foundId || false;
 };
 
 //console.log(findIdFromEmail('sample@email.com', 'sneaky'))
@@ -54,7 +64,7 @@ app.get("/registration", (req, res) => {
   let userId = req.cookies.userId
 
   let templateVars = { urls: urlDataBase, user: users.userId };
- // log(email)
+  // log(email)
   res.render('registration', templateVars);
 });
 
@@ -73,8 +83,9 @@ app.post("/login", (req, res) => {
   } else {
     res.status(400);
     res.redirect("/registration")
-   // log(email, password);
-  }});
+    // log(email, password);
+  }
+});
 
 app.post("/logout", (req, res) => {
   res.clearCookie('userId');
@@ -98,10 +109,6 @@ app.get("/urls", (req, res) => {
   log(req.cookies.userId)
   let userId = req.cookies.userId
   log(users.userId)
-  //log(users[id])
-  //let email;
-  // users.id.email ? email = users[id].email : email = '';
-  // log(email)
   let templateVars = { urls: urlDataBase, user: users[userId] };
   //log(users[userId].email)
   res.render("urls_index", templateVars);
@@ -111,23 +118,24 @@ app.post("/register", (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
-  if (!(email || password)) {
+
+  if (!(email || password) || doesEmailExist(email)) {
     res.status(400);
     res.redirect("/registration")
-  }
+  } else {
 
-  const userId = generateRandomString();
-  users[userId] = {
-    userId,
-    email,
-    password
+    const userId = generateRandomString();
+    users[userId] = {
+      userId,
+      email,
+      password
+    };
+    res.cookie('userId', userId);
+    let templateVars = { urls: urlDataBase, user: users[userId] };
+    log(users[userId].email)
+    res.redirect("/urls");
   };
-  res.cookie('userId', userId);
-  let templateVars = { urls: urlDataBase, user: users[userId] };
-  log(users[userId].email)
-  res.redirect("/urls");
 });
-
 
 app.get("/urls/:shortURL", (req, res) => {
   let userId = req.cookies.userId
