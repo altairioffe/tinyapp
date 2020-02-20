@@ -29,36 +29,6 @@ const findIdFromEmail = function(email, password, users) {
   return foundId || false;
 };
 
-// const findUrlsForUserId = function(userId) {
-//   let userLinks = {};
-//   for (let link in urlDataBase) {
-//     if (urlDataBase[link].userId === userId) {
-//       userLinks[link] = urlDataBase[link].longURL;
-//     }
-//   }
-//   return userLinks;
-// };
-
-// const createUser = function(req, res) {
-//   const email = req.body.email;
-//   const password = req.body.password;
-//   const hashedPassword = bcrypt.hashSync(password, 10);
-
-//   if (!email || !password || doesEmailExist(email)) {
-//     res.status(400);
-//     res.redirect("/registration");
-//   } else {
-
-//     const userId = generateRandomString();
-//     users[userId] = {
-//       userId,
-//       email,
-//       hashedPassword,
-//     };
-//     req.session.userId = userId;
-//     res.redirect("/urls");
-//   };
-// };
 
 module.exports = {
   generateRandomString,
