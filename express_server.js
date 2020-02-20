@@ -10,6 +10,22 @@ app.use(cookieParser())
 
 const bcrypt = require("bcrypt");
 
+app.use((req, res, next) => {
+  const userId = req.cookies.userId;
+  const user = users[userId];
+  const userLinks = urlsForUserId(userId);
+  
+  req.user = user;
+  res.locals.user = user;
+  res.locals.urls = userLinks;
+  next();
+
+
+  //let templateVars = { urls: userLinks, user: users[userId] };
+
+});
+
+
 const PORT = 8080;
 const log = console.log;
 
@@ -33,12 +49,13 @@ const users = {
 
 const generateRandomString = function() {
   let random = [];
-  let characters = ['a', 'b', 'c', 7, 8, 9];
+  let characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 1, 2, 3, 4, 5, 6, 7, 8, 9];
   for (let i = 0; i < 6; i++) {
-    random.push(characters[(Math.floor(Math.random() * 6))]);
+    random.push(characters[(Math.floor(Math.random() * 19))]);
   }
   return random.join('');
 };
+console.log(generateRandomString())
 
 const doesEmailExist = function(email) {
   let foundEmail;
@@ -53,7 +70,7 @@ const doesEmailExist = function(email) {
 const findIdFromEmail = function(email, password) {
   let foundId;
   for (let key in users) {
-    if (users[key].email === email &&  bcrypt.compare(password, users[key].hashedPassword)) {
+    if (users[key].email === email && bcrypt.compare(password, users[key].hashedPassword)) {
       return foundId = key;
     }
   }
@@ -87,19 +104,13 @@ const createUser = function(req, res) {
       hashedPassword,
     };
     res.cookie('userId', userId);
-    let templateVars = { urls: urlDataBase, user: users[userId] };
     log(users[userId]);
     res.redirect("/urls");
   };
 }
 
-//console.log(urlsForUserId('user1Id'))
-
 app.get("/registration", (req, res) => {
-  let userId = req.cookies.userId;
-
-  let templateVars = { urls: urlDataBase, user: users.userId };
-  res.render('registration', templateVars);
+  res.render('registration');
 });
 
 app.get("/urls.json", (req, res) => {
@@ -132,18 +143,15 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/registration")
   } else {
 
-    let templateVars = { user: users[userId] };
-    res.render("urls_new", templateVars);
+    res.render("urls_new");
   }
 });
 
 app.get("/urls", (req, res) => {
- // log(req.cookies.userId);
-  let userId = req.cookies.userId;
-  let userLinks = urlsForUserId(userId)
- // log(users.userId);
-  let templateVars = { urls: userLinks, user: users[userId] };
-  res.render("urls_index", templateVars);
+  // let userId = req.cookies.userId;
+  // let userLinks = urlsForUserId(userId);
+  // let templateVars = { urls: userLinks, user: users[userId] };
+  res.render("urls_index");
 });
 
 app.post("/register", (req, res) => {
@@ -153,7 +161,6 @@ app.post("/register", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
 
   let userId = req.cookies.userId;
- // let userLinks = urlsForUserId(userId)
   let shortURL = req.params.shortURL;
   let longURL = urlDataBase[shortURL].longURL;
   let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
