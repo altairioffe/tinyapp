@@ -21,8 +21,8 @@ const generateRandomString = function() {
 };
 
 const urlDataBase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.getindezone.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: 'user1Id' },
+  "9sm5xK": { longURL: "http://www.getindezone.com", userId: 'user1Id' }
 };
 
 const users = {
@@ -32,7 +32,7 @@ const users = {
     password: "sneaky"
   },
   "user2Id": {
-    userId: "use21Id",
+    userId: "user21Id",
     email: "sample2@email.com",
     password: "sneaky"
   }
@@ -57,6 +57,17 @@ const findIdFromEmail = function(email, password) {
   }
   return foundId || false;
 };
+
+const urlsForUserId = function(userId) {
+  let userLinks = {};
+  for (let link in urlDataBase) {
+    if (urlDataBase[link].userId === userId) {
+      userLinks[link] = urlDataBase[link].longURL;
+    }
+  }
+  return userLinks;
+};
+console.log(urlsForUserId('user1Id'))
 
 
 app.get("/registration", (req, res) => {
@@ -95,20 +106,22 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let userId = req.cookies.userId;
+
   if (!userId) {
     res.redirect("/registration")
   } else {
-  let templateVars = { user: users[userId] };
-  res.render("urls_new", templateVars);
+
+    let templateVars = { user: users[userId] };
+    res.render("urls_new", templateVars);
   }
 });
-
 
 app.get("/urls", (req, res) => {
   log(req.cookies.userId);
   let userId = req.cookies.userId;
+  let userLinks = urlsForUserId(userId)
   log(users.userId);
-  let templateVars = { urls: urlDataBase, user: users[userId] };
+  let templateVars = { urls: userLinks, user: users[userId] };
   res.render("urls_index", templateVars);
 });
 
@@ -159,12 +172,13 @@ app.post("/urls", (req, res) => {
 
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
+  let userId = req.cookies.userId;
   const email = req.body.email;
   const password = req.body.password;
   log(email, password);
 
   const redirect = `/urls/${shortURL}`;
-  urlDataBase[shortURL] = longURL;
+  urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
   res.redirect(redirect);
 });
 
