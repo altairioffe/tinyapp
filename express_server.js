@@ -46,7 +46,7 @@ const doesEmailExist = function(email) {
     }
   }
   return result || false;
-}
+};
 
 const findIdFromEmail = function(email, password) {
   let foundId;
@@ -58,13 +58,11 @@ const findIdFromEmail = function(email, password) {
   return foundId || false;
 };
 
-//console.log(findIdFromEmail('sample@email.com', 'sneaky'))
 
 app.get("/registration", (req, res) => {
-  let userId = req.cookies.userId
+  let userId = req.cookies.userId;
 
   let templateVars = { urls: urlDataBase, user: users.userId };
-  // log(email)
   res.render('registration', templateVars);
 });
 
@@ -82,8 +80,7 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
   } else {
     res.status(400);
-    res.redirect("/registration")
-    // log(email, password);
+    res.redirect("/registration");
   }
 });
 
@@ -97,20 +94,17 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let userId = req.cookies.userId
+  let userId = req.cookies.userId;
   let templateVars = { user: users[userId] };
-  //log(email)
-
   res.render("urls_new", templateVars);
 });
 
 
 app.get("/urls", (req, res) => {
-  log(req.cookies.userId)
-  let userId = req.cookies.userId
-  log(users.userId)
+  log(req.cookies.userId);
+  let userId = req.cookies.userId;
+  log(users.userId);
   let templateVars = { urls: urlDataBase, user: users[userId] };
-  //log(users[userId].email)
   res.render("urls_index", templateVars);
 });
 
@@ -121,7 +115,7 @@ app.post("/register", (req, res) => {
 
   if (!(email || password) || doesEmailExist(email)) {
     res.status(400);
-    res.redirect("/registration")
+    res.redirect("/registration");
   } else {
 
     const userId = generateRandomString();
@@ -132,13 +126,13 @@ app.post("/register", (req, res) => {
     };
     res.cookie('userId', userId);
     let templateVars = { urls: urlDataBase, user: users[userId] };
-    log(users[userId].email)
+    log(users[userId].email);
     res.redirect("/urls");
   };
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  let userId = req.cookies.userId
+  let userId = req.cookies.userId;
   const shortURL = req.params.shortURL;
   let templateVars = { shortURL: shortURL, longURL: urlDataBase[shortURL], user: users[userId] };
   res.render("urls_show", templateVars);
@@ -152,7 +146,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const shortURL = req.params.shortURL
+  const shortURL = req.params.shortURL;
   delete urlDataBase[shortURL];
   res.redirect("/urls");
 });
@@ -162,7 +156,7 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password
+  const password = req.body.password;
   log(email, password);
 
   const redirect = `/urls/${shortURL}`;
