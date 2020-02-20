@@ -147,8 +147,8 @@ app.get("/urls/:shortURL", (req, res) => {
 
   let userId = req.cookies.userId;
   let userLinks = urlsForUserId(userId)
-  let longURL = urlDataBase.shortURL;
   let shortURL = req.params.shortURL;
+  let longURL = urlDataBase[shortURL].longURL;
   let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
   res.render("urls_show", templateVars);
 });
