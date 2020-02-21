@@ -19,3 +19,17 @@ Made by [Altair Ioffe](https://github.com/altairioffe) as a project for [Lightho
   * Dynamically renders client-side using HTML, CSS, and Javascript, according to routing in express_server.js
 * [test](/test): 
   * Folder containing Mocha & Chai testing suite
+
+  ## Main Features
+
+* User accounts: 
+  * Registration & login forms
+  * User-specific database containing saved links. Database can only be accessed or modified by account holder, but shortened URLs can be shared with anyone
+  * Encrypted session with password hashing
+  * Random-generated user ID for added security
+  * Logout buttpm in header
+
+* URL Shortnener: 
+  * Takes input URL from user and auto-generates a short link which takes users to the same destination.
+  * Account holders are able to Create, Update / Edit, or Delete any of their links. Others can use the short link.
+    

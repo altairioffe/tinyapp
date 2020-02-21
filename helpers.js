@@ -19,6 +19,7 @@ const doesEmailExist = function(email, users) {
   return foundEmail || false;
 };
 
+// Returns user ID if and only if their email exists in database
 const findIdFromEmail = function(email, password, users) {
   let foundId;
   for (let key in users) {
@@ -30,18 +31,19 @@ const findIdFromEmail = function(email, password, users) {
   return foundId || false;
 };
 
+
 const authenticatePassword = function(validatedId, password, users) {
-  let passwordsMatch;
+ let passwordsMatch;
 
   bcrypt.compare(password, users[validatedId].hashedPassword)
     .then((result) => {
-      if (result) return passwordsMatch = result
+      if (result)  console.log('helper: ', result);
     })
     .catch((err) => console.log('authentication failed'))
-  console.log(passwordsMatch);
-}
+  //console.log(passwordsMatch);
+};
 
-
+ 
 module.exports = {
   generateRandomString,
   doesEmailExist,

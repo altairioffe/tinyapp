@@ -1,6 +1,10 @@
 const helpers = require('./helpers.js');
 const { generateRandomString, doesEmailExist, findIdFromEmail, authenticatePassword } = helpers;
 
+const PORT = 8080;
+const log = console.log;
+
+//MIDDLEWARE:
 const express = require('express');
 const app = express();
 app.set("view engine", "ejs");
@@ -12,9 +16,6 @@ const cookieSession = require("cookie-session");
 app.use(cookieSession({ name: 'session', keys: ['ghfjhgf'] }));
 
 const bcrypt = require("bcrypt");
-
-const PORT = 8080;
-const log = console.log;
 
 app.use((req, res, next) => {
   const userId = req.session.userId;
@@ -28,7 +29,6 @@ app.use((req, res, next) => {
 });
 
 //SAMPLE DATABASES:
-
 const urlDataBase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: 'user1Id' },
   "9sm5xK": { longURL: "http://www.getindezone.com", userId: 'user1Id' }
@@ -52,6 +52,7 @@ const users = {
 const findUrlsForUserId = function(userId) {
 
   let userLinks = {};
+
   for (let link in urlDataBase) {
     if (urlDataBase[link].userId === userId) {
       userLinks[link] = urlDataBase[link].longURL;
@@ -59,7 +60,7 @@ const findUrlsForUserId = function(userId) {
   }
   return userLinks;
 };
-
+/////[EXPORT]
 const validateUserLink = function(userId, shortlink) {
 
   const userLinks = findUrlsForUserId(userId, shortlink);
@@ -80,8 +81,10 @@ const createUser = function(req, res) {
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email || !password || doesEmailExist(email, users)) {
+
     res.status(400);
     res.redirect("/registration");
+
   } else {
 
     const userId = generateRandomString();
@@ -113,17 +116,27 @@ app.post("/login", (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
- // log(password)
-  let userId = findIdFromEmail(email, password, users);
-  log(authenticatePassword(userId, password, users))
-  if (userId && authenticatePassword(userId, password, users)) {
 
-    req.session.userId = userId;
-    res.redirect("/urls");
+  let userId = findIdFromEmail(email, password, users);
+
+  if (userId) {
+
+    if (bcrypt.compareSync(password, users[userId].hashedPassword)) {
+
+      req.session.userId = userId;
+      res.redirect("/urls");
+    }
+    else {
+      res.sendStatus(403);
+    }
+
   } else {
-    res.status(400).send('incorrect login details, pls try again');
-   // res.redirect("/registration");
+
+    res.status(400).send('email does not exist');
   }
+
+  log('from post route: ', userId);
+
 });
 
 app.post("/logout", (req, res) => {
@@ -137,19 +150,18 @@ app.get("/urls/new", (req, res) => {
   let userId = req.user;
 
   if (!userId) {
-    res.redirect("/registration");
+    res.status(400).send('YOU MUST BE LOGGED IN TO DO THAT');
   } else {
     res.render("urls_new");
   }
 });
-
 
 app.get("/urls", (req, res) => {
 
   let userId = req.user;
 
   if (!userId) {
-    res.redirect("/registration");
+    res.status(400).send('YOU MUST BE LOGGED IN TO DO THAT');
   } else {
     res.render("urls_index");
   }
@@ -159,14 +171,13 @@ app.post("/register", (req, res) => {
   return createUser(req, res);
 });
 
-
 app.get("/urls/:shortURL", (req, res) => {
 
   let userId = req.session.userId;
   let shortURL = req.params.shortURL;
 
   if (!validateUserLink(userId, shortURL)) {
-    res.send('THATS NOT YOUR LINK')
+    res.send('THATS NOT YOUR LINK');
   };
 
   let longURL = urlDataBase[shortURL];
@@ -175,37 +186,65 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
+
   let userId = req.session.userId;
   const shortURL = req.params.shortURL;
   const newURL = req.body.newURL;
 
-  urlDataBase[shortURL] = { 'longURL': newURL, 'userId': userId };
-  res.redirect("/urls");
+  if (!validateUserLink(userId, shortURL)) {
+
+    res.status(400).send('THATS NOT YOUR LINK');
+
+  } else {
+
+    urlDataBase[shortURL] = { 'longURL': newURL, 'userId': userId };
+    res.redirect("/urls");
+  }
 });
 
-
 app.post("/urls/:shortURL/delete", (req, res) => {
+
+  let userId = req.session.userId;
   const shortURL = req.params.shortURL;
-  delete urlDataBase[shortURL];
-  res.redirect("/urls");
+
+  if (!validateUserLink(userId, shortURL)) {
+    res.send('THATS NOT YOUR LINK');
+
+  } else {
+
+    delete urlDataBase[shortURL];
+    res.redirect("/urls");
+  };
 });
 
 app.post("/urls", (req, res) => {
 
   let userId = req.session.userId;
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
-  urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
-  res.redirect("/urls");
+
+  if (!userId) {
+
+    res.send('LOG IN TO SEE YO LINKS');
+
+  } else {
+
+    const longURL = req.body.longURL;
+    const shortURL = generateRandomString();
+
+    urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
+    res.redirect("/urls");
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
+
   const shortURL = req.params.shortURL;
   const longURL = urlDataBase[shortURL].longURL;
+
   res.redirect(longURL);
 });
 
 app.get("/", (req, res) => {
+
   let userId = req.session.userId;
   if (!userId) {
     res.redirect("/registration");
