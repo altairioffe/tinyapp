@@ -62,7 +62,7 @@ const findUrlsForUserId = function(userId) {
 /////[EXPORT]
 const validateUserLink = function(userId, shortlink) {
 
-  const userLinks = findUrlsForUserId(userId, shortlink);
+  const userLinks = findUrlsForUserId(userId);
 
   let usersMatch = false;
 
@@ -176,7 +176,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
 
   if (!validateUserLink(userId, shortURL)) {
-    res.send('THIS LINK IS NOT IN YOUR ACCOUNT');
+    res.send('THIS LINK IS NOT IN YOUR ACCOUNT. <a href="/registration">LOG IN</a> or GO BACK TO WHERE YOU CAME FROM');
   };
 
   let longURL = urlDataBase[shortURL];
@@ -237,9 +237,16 @@ app.post("/urls", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
 
   const shortURL = req.params.shortURL;
-  const longURL = urlDataBase[shortURL].longURL;
+  //log(urlDataBase[shortURL])
 
-  res.redirect(longURL);
+  if (urlDataBase[shortURL] === undefined) {
+    res.status(400).send("THAT'S NOT EVEN A VALID LINK! <a href='/registration'>LOG IN</a> TO CREATE ONE THAT ACTUALLY WORKS!");
+
+  } else {
+
+    const longURL = urlDataBase[shortURL].longURL;
+    res.redirect(longURL);
+  }
 });
 
 app.get("/", (req, res) => {

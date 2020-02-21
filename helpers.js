@@ -43,10 +43,26 @@ const authenticatePassword = function(validatedId, password, users) {
   //console.log(passwordsMatch);
 };
 
+
+
  
+const validateUserLink = function(userId, shortlink) {
+
+  const userLinks = findUrlsForUserId(userId, shortlink);
+
+  let usersMatch = false;
+
+  for (let key in userLinks) {
+    if (key === shortlink) {
+      return usersMatch = true;
+    }
+  }
+};
+
 module.exports = {
   generateRandomString,
   doesEmailExist,
   findIdFromEmail,
-  authenticatePassword
+  authenticatePassword,
+  validateUserLink
 };
