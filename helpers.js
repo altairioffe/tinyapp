@@ -44,11 +44,21 @@ const authenticatePassword = function(validatedId, password, users) {
 };
 
 
+const findUrlsForUserId = function(userId, urlDataBase) {
 
+  let userLinks = {};
+
+  for (let link in urlDataBase) {
+    if (urlDataBase[link].userId === userId) {
+      userLinks[link] = urlDataBase[link].longURL;
+    }
+  }
+  return userLinks;
+};
  
-const validateUserLink = function(userId, shortlink) {
+const validateUserLink = function(userId, shortlink, urlDataBase) {
 
-  const userLinks = findUrlsForUserId(userId, shortlink);
+  const userLinks = findUrlsForUserId(userId, urlDataBase);
 
   let usersMatch = false;
 
@@ -64,5 +74,6 @@ module.exports = {
   doesEmailExist,
   findIdFromEmail,
   authenticatePassword,
-  validateUserLink
+  validateUserLink,
+  findUrlsForUserId
 };

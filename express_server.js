@@ -1,5 +1,5 @@
 const helpers = require('./helpers.js');
-const { generateRandomString, doesEmailExist, findIdFromEmail, authenticatePassword } = helpers;
+const { generateRandomString, doesEmailExist, findIdFromEmail, findUrlsForUserId, validateUserLink } = helpers;
 
 const PORT = 8080;
 const log = console.log;
@@ -20,7 +20,7 @@ const bcrypt = require("bcrypt");
 app.use((req, res, next) => {
   const userId = req.session.userId;
   const user = users[userId];
-  const userLinks = findUrlsForUserId(userId);
+  const userLinks = findUrlsForUserId(userId, urlDataBase);
 
   req.user = user;
   res.locals.user = user;
@@ -48,30 +48,30 @@ const users = {
 };
 
 //HELPER FUNCTIONS:
-const findUrlsForUserId = function(userId) {
+// const findUrlsForUserId = function(userId, urlDataBase) {
 
-  let userLinks = {};
+//   let userLinks = {};
 
-  for (let link in urlDataBase) {
-    if (urlDataBase[link].userId === userId) {
-      userLinks[link] = urlDataBase[link].longURL;
-    }
-  }
-  return userLinks;
-};
-/////[EXPORT]
-const validateUserLink = function(userId, shortlink) {
+//   for (let link in urlDataBase) {
+//     if (urlDataBase[link].userId === userId) {
+//       userLinks[link] = urlDataBase[link].longURL;
+//     }
+//   }
+//   return userLinks;
+// };
+// /////[EXPORT]
+// const validateUserLink = function(userId, shortlink, urlDataBase) {
 
-  const userLinks = findUrlsForUserId(userId);
+//   const userLinks = findUrlsForUserId(userId, urlDataBase);
 
-  let usersMatch = false;
+//   let usersMatch = false;
 
-  for (let key in userLinks) {
-    if (key === shortlink) {
-      return usersMatch = true;
-    }
-  }
-};
+//   for (let key in userLinks) {
+//     if (key === shortlink) {
+//       return usersMatch = true;
+//     }
+//   }
+// };
 
 const createUser = function(req, res) {
 
@@ -157,11 +157,13 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls", (req, res) => {
 
-  let userId = req.user;
+  let userId = req.session.userId;
 
   if (!userId) {
     res.status(400).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
   } else {
+
+    log(urlDataBase)
     res.render("urls_index");
   }
 });
@@ -175,7 +177,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let userId = req.session.userId;
   let shortURL = req.params.shortURL;
 
-  if (!validateUserLink(userId, shortURL)) {
+  if (!validateUserLink(userId, shortURL, urlDataBase)) {
     res.send('THIS LINK IS NOT IN YOUR ACCOUNT. <a href="/registration">LOG IN</a> or GO BACK TO WHERE YOU CAME FROM');
   };
 
@@ -190,7 +192,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
   const shortURL = req.params.shortURL;
   const newURL = req.body.newURL;
 
-  if (!validateUserLink(userId, shortURL)) {
+  if (!validateUserLink(userId, shortURL, urlDataBase)) {
 
     res.status(400).send('THATS NOT YOUR LINK');
 
@@ -206,7 +208,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   let userId = req.session.userId;
   const shortURL = req.params.shortURL;
 
-  if (!validateUserLink(userId, shortURL)) {
+  if (!validateUserLink(userId, shortURL, urlDataBase)) {
     res.send('THATS NOT YOUR LINK');
 
   } else {
@@ -215,6 +217,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.redirect("/urls");
   };
 });
+
+
+
+
+
+
 
 app.post("/urls", (req, res) => {
 
@@ -229,10 +237,18 @@ app.post("/urls", (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
 
+
     urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
+
+   // log(urlDataBase)
+
     res.redirect("/urls");
   }
 });
+
+
+
+
 
 app.get("/u/:shortURL", (req, res) => {
 
