@@ -32,6 +32,8 @@ const urlDataBase = {
   "9sm5xK": { longURL: "http://www.getindezone.com", userId: 'user1Id' }
 };
 
+log(urlDataBase);
+
 const users = {
   "user1Id": {
     userId: "user1Id",
@@ -56,6 +58,25 @@ const findUrlsForUserId = function(userId) {
   return userLinks;
 };
 
+const findOwnerByLink = function(shortLink) {
+
+}
+
+const validateUserLink = function(userId, shortlink) {
+  
+  //passing in session userID
+  const userLinks = findUrlsForUserId(userId, shortlink)
+  log(userLinks);
+  log(userLinks[shortlink]);
+
+  let usersMatch = false;
+  for (let key in userLinks) {
+    if (key === shortlink) {
+      return usersMatch = true;
+    }
+  }
+};
+
 const createUser = function(req, res) {
   const email = req.body.email;
   const password = req.body.password;
@@ -73,6 +94,8 @@ const createUser = function(req, res) {
       hashedPassword,
     };
     req.session.userId = userId;
+
+   // log(users)
     res.redirect("/urls");
   }
 };
@@ -123,10 +146,15 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-
+  
   let userId = req.session.userId;
   let shortURL = req.params.shortURL;
-  let longURL = urlDataBase[shortURL].longURL;
+  
+  if (!validateUserLink(userId, shortURL)){
+    res.send('THATS NOT YOUR LINK')
+  };
+
+  let longURL = urlDataBase[shortURL];
   let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
   res.render("urls_show", templateVars);
 });
@@ -140,6 +168,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
   urlDataBase[shortURL] = { 'longURL': newURL, 'userId': userId };
   res.redirect("/urls");
 });
+
+
+
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
