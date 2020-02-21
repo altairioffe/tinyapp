@@ -1,5 +1,5 @@
 const helpers = require('./helpers.js');
-const { generateRandomString, doesEmailExist, findIdFromEmail } = helpers;
+const { generateRandomString, doesEmailExist, findIdFromEmail, authenticatePassword } = helpers;
 
 const express = require('express');
 const app = express();
@@ -113,14 +113,16 @@ app.post("/login", (req, res) => {
 
   const email = req.body.email;
   const password = req.body.password;
+ // log(password)
   let userId = findIdFromEmail(email, password, users);
+  log(authenticatePassword(userId, password, users))
+  if (userId && authenticatePassword(userId, password, users)) {
 
-  if (userId) {
     req.session.userId = userId;
     res.redirect("/urls");
   } else {
-    res.status(400);
-    res.redirect("/registration");
+    res.status(400).send('incorrect login details, pls try again');
+   // res.redirect("/registration");
   }
 });
 

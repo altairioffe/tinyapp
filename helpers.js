@@ -8,7 +8,6 @@ const generateRandomString = function() {
   }
   return random.join('');
 };
-console.log(generateRandomString())
 
 const doesEmailExist = function(email, users) {
   let foundEmail;
@@ -23,17 +22,29 @@ const doesEmailExist = function(email, users) {
 const findIdFromEmail = function(email, password, users) {
   let foundId;
   for (let key in users) {
-    if (users[key].email === email && bcrypt.compare(password, users[key].hashedPassword)) {
-      return foundId = key;
+
+    if (users[key].email === email) {
+      foundId = key;
     }
   }
   return foundId || false;
 };
 
+const authenticatePassword = function(validatedId, password, users) {
+  let passwordsMatch;
+
+  bcrypt.compare(password, users[validatedId].hashedPassword)
+    .then((result) => {
+      if (result) return passwordsMatch = result
+    })
+    .catch((err) => console.log('authentication failed'))
+  console.log(passwordsMatch);
+}
+
 
 module.exports = {
   generateRandomString,
   doesEmailExist,
-  findIdFromEmail
-
+  findIdFromEmail,
+  authenticatePassword
 };
