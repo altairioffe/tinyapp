@@ -4,10 +4,11 @@ const generateRandomString = function() {
   let random = [];
   let characters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 1, 2, 3, 4, 5, 6, 7, 8, 9];
   for (let i = 0; i < 6; i++) {
-    random.push(characters[(Math.floor(Math.random() * 19))]);
+    random.push(characters[(Math.floor(Math.random() * 18))]);
   }
   return random.join('');
 };
+console.log(generateRandomString())
 
 const doesEmailExist = function(email, users) {
   let foundEmail;
@@ -33,7 +34,6 @@ const findIdFromEmail = function(email, password, users) {
 module.exports = {
   generateRandomString,
   doesEmailExist,
-  findIdFromEmail,
-  // findUrlsForUserId,
-  // createUser,
+  findIdFromEmail
+
 };

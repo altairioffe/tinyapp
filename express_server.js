@@ -13,6 +13,9 @@ app.use(cookieSession({ name: 'session', keys: ['ghfjhgf'] }));
 
 const bcrypt = require("bcrypt");
 
+const PORT = 8080;
+const log = console.log;
+
 app.use((req, res, next) => {
   const userId = req.session.userId;
   const user = users[userId];
@@ -24,15 +27,12 @@ app.use((req, res, next) => {
   next();
 });
 
-const PORT = 8080;
-const log = console.log;
+//SAMPLE DATABASES:
 
 const urlDataBase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: 'user1Id' },
   "9sm5xK": { longURL: "http://www.getindezone.com", userId: 'user1Id' }
 };
-
-log(urlDataBase);
 
 const users = {
   "user1Id": {
@@ -47,8 +47,10 @@ const users = {
   }
 };
 
+//HELPER FUNCTIONS
 
 const findUrlsForUserId = function(userId) {
+
   let userLinks = {};
   for (let link in urlDataBase) {
     if (urlDataBase[link].userId === userId) {
@@ -61,10 +63,9 @@ const findUrlsForUserId = function(userId) {
 const validateUserLink = function(userId, shortlink) {
 
   const userLinks = findUrlsForUserId(userId, shortlink);
-  log(userLinks);
-  log(userLinks[shortlink]);
 
   let usersMatch = false;
+
   for (let key in userLinks) {
     if (key === shortlink) {
       return usersMatch = true;
@@ -73,6 +74,7 @@ const validateUserLink = function(userId, shortlink) {
 };
 
 const createUser = function(req, res) {
+
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -83,6 +85,7 @@ const createUser = function(req, res) {
   } else {
 
     const userId = generateRandomString();
+
     users[userId] = {
       userId,
       email,
@@ -90,20 +93,24 @@ const createUser = function(req, res) {
     };
     req.session.userId = userId;
 
-    // log(users)
     res.redirect("/urls");
   }
 };
 
+//ROUTING:
+
 app.get("/registration", (req, res) => {
+
   res.render('registration');
 });
 
 app.get("/urls.json", (req, res) => {
+
   res.json(urlDataBase);
 });
 
 app.post("/login", (req, res) => {
+
   const email = req.body.email;
   const password = req.body.password;
   let userId = findIdFromEmail(email, password, users);
@@ -117,14 +124,16 @@ app.post("/login", (req, res) => {
   }
 });
 
-/////
 app.post("/logout", (req, res) => {
+
   req.session = null;
   res.redirect("/registration");
 });
 
 app.get("/urls/new", (req, res) => {
-  let userId = req.session.userId;
+
+  let userId = req.user;
+
   if (!userId) {
     res.redirect("/registration");
   } else {
@@ -132,8 +141,11 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+
 app.get("/urls", (req, res) => {
-  let userId = req.session.userId;
+
+  let userId = req.user;
+
   if (!userId) {
     res.redirect("/registration");
   } else {
@@ -144,6 +156,7 @@ app.get("/urls", (req, res) => {
 app.post("/register", (req, res) => {
   return createUser(req, res);
 });
+
 
 app.get("/urls/:shortURL", (req, res) => {
 
@@ -158,7 +171,6 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
   res.render("urls_show", templateVars);
 });
-///////
 
 app.post("/urls/:shortURL/update", (req, res) => {
   let userId = req.session.userId;
@@ -176,7 +188,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//CREATE NEW SHORT URL
 app.post("/urls", (req, res) => {
 
   let userId = req.session.userId;
@@ -186,11 +197,19 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-//REDIRECT from short to targrt URL
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDataBase[shortURL].longURL;
   res.redirect(longURL);
+});
+
+app.get("/", (req, res) => {
+  let userId = req.session.userId;
+  if (!userId) {
+    res.redirect("/registration");
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 app.listen(PORT, () => {
