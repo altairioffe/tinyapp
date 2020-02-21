@@ -28,7 +28,7 @@ app.use((req, res, next) => {
   next();
 });
 
-//SAMPLE DATABASES:
+// DATABASES:
 const urlDataBase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: 'user1Id' },
   "9sm5xK": { longURL: "http://www.getindezone.com", userId: 'user1Id' }
@@ -47,8 +47,7 @@ const users = {
   }
 };
 
-//HELPER FUNCTIONS
-
+//HELPER FUNCTIONS:
 const findUrlsForUserId = function(userId) {
 
   let userLinks = {};
@@ -127,12 +126,12 @@ app.post("/login", (req, res) => {
       res.redirect("/urls");
     }
     else {
-      res.sendStatus(403);
+      res.status(400).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
     }
 
   } else {
 
-    res.status(400).send('email does not exist');
+    res.status(400).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
   }
 
   log('from post route: ', userId);
@@ -150,7 +149,7 @@ app.get("/urls/new", (req, res) => {
   let userId = req.user;
 
   if (!userId) {
-    res.status(400).send('YOU MUST BE LOGGED IN TO DO THAT');
+    res.status(400).send('YOU MUST BE <a href="/registration">LOGGED IN</a> TO DO THAT');
   } else {
     res.render("urls_new");
   }
@@ -161,7 +160,7 @@ app.get("/urls", (req, res) => {
   let userId = req.user;
 
   if (!userId) {
-    res.status(400).send('YOU MUST BE LOGGED IN TO DO THAT');
+    res.status(400).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
   } else {
     res.render("urls_index");
   }
@@ -177,7 +176,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
 
   if (!validateUserLink(userId, shortURL)) {
-    res.send('THATS NOT YOUR LINK');
+    res.send('THIS LINK IS NOT IN YOUR ACCOUNT');
   };
 
   let longURL = urlDataBase[shortURL];
@@ -223,7 +222,7 @@ app.post("/urls", (req, res) => {
 
   if (!userId) {
 
-    res.send('LOG IN TO SEE YO LINKS');
+    res.status(400).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
 
   } else {
 
