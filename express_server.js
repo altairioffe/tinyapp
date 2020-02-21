@@ -1,5 +1,5 @@
 const helpers = require('./helpers.js');
-const {generateRandomString, doesEmailExist, findIdFromEmail} = helpers;
+const { generateRandomString, doesEmailExist, findIdFromEmail } = helpers;
 
 const express = require('express');
 const app = express();
@@ -58,14 +58,9 @@ const findUrlsForUserId = function(userId) {
   return userLinks;
 };
 
-const findOwnerByLink = function(shortLink) {
-
-}
-
 const validateUserLink = function(userId, shortlink) {
-  
-  //passing in session userID
-  const userLinks = findUrlsForUserId(userId, shortlink)
+
+  const userLinks = findUrlsForUserId(userId, shortlink);
   log(userLinks);
   log(userLinks[shortlink]);
 
@@ -95,7 +90,7 @@ const createUser = function(req, res) {
     };
     req.session.userId = userId;
 
-   // log(users)
+    // log(users)
     res.redirect("/urls");
   }
 };
@@ -138,7 +133,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  res.render("urls_index");
+  let userId = req.session.userId;
+  if (!userId) {
+    res.redirect("/registration");
+  } else {
+    res.render("urls_index");
+  }
 });
 
 app.post("/register", (req, res) => {
@@ -146,11 +146,11 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  
+
   let userId = req.session.userId;
   let shortURL = req.params.shortURL;
-  
-  if (!validateUserLink(userId, shortURL)){
+
+  if (!validateUserLink(userId, shortURL)) {
     res.send('THATS NOT YOUR LINK')
   };
 
@@ -170,8 +170,6 @@ app.post("/urls/:shortURL/update", (req, res) => {
 });
 
 
-
-
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDataBase[shortURL];
@@ -180,7 +178,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //CREATE NEW SHORT URL
 app.post("/urls", (req, res) => {
-  
+
   let userId = req.session.userId;
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
@@ -198,6 +196,5 @@ app.get("/u/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   log(`Example app listening on port ${PORT}`);
 });
-
 
 module.exports = { users };
