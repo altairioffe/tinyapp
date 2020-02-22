@@ -33,13 +33,12 @@ const findIdFromEmail = function(email, password, users) {
 
 
 const authenticatePassword = function(validatedId, password, users) {
- let passwordsMatch;
 
   bcrypt.compare(password, users[validatedId].hashedPassword)
     .then((result) => {
-      if (result)  console.log('helper: ', result);
+      if (result) console.log('helper: ', result);
     })
-    .catch((err) => console.log('authentication failed'))
+    .catch((err) => console.log('authentication failed: ', err));
 };
 
 
@@ -54,7 +53,7 @@ const findUrlsForUserId = function(userId, urlDataBase) {
   }
   return userLinks;
 };
- 
+
 const validateUserLink = function(userId, shortlink, urlDataBase) {
 
   const userLinks = findUrlsForUserId(userId, urlDataBase);

@@ -47,17 +47,21 @@ const users = {
   }
 };
 
-//HELPER FUNCTION:
-
+//HELPER FUNCTION TO CREAT USER:
 const createUser = function(req, res) {
 
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  if (!email || !password || doesEmailExist(email, users)) {
+  if (doesEmailExist(email, users)) {
 
-    res.status(400);
+    res.status(400).send('CONGRATS, YOU ALREADY HAVE AN ACCOUNT WITH THAT EMAIL!  <a href="/registration"> GO BACK AND LOG IN!</a>');
+    res.redirect("/registration");
+
+  } else if (!email || !password) {
+
+    res.status(400).send('WE REALLY NEED YOU TO ENTER AN EMAIL <em>AND</em> PASSWORD TO CREATE AN ACCOUNT  <a href="/registration">try again</a>');
     res.redirect("/registration");
 
   } else {
@@ -71,21 +75,26 @@ const createUser = function(req, res) {
     };
     req.session.userId = userId;
 
-    res.redirect("/urls");
+    res.status(303).redirect("/urls");
   }
 };
 
 //ROUTING:
-
 app.get("/registration", (req, res) => {
 
   res.render('registration');
 });
 
+app.post("/register", (req, res) => {
+  return createUser(req, res);
+});
+
+
 app.get("/urls.json", (req, res) => {
 
   res.json(urlDataBase);
 });
+
 
 app.post("/login", (req, res) => {
 
@@ -100,14 +109,14 @@ app.post("/login", (req, res) => {
 
       req.session.userId = userId;
       res.redirect("/urls");
-    }
-    else {
-      res.status(400).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
+
+    } else {
+      res.status(401).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
     }
 
   } else {
 
-    res.status(400).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
+    res.status(401).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
   }
 });
 
@@ -122,27 +131,10 @@ app.get("/urls/new", (req, res) => {
   let userId = req.user;
 
   if (!userId) {
-    res.status(400).send('YOU MUST BE <a href="/registration">LOGGED IN</a> TO DO THAT');
+    res.status(401).send('YOU MUST BE <a href="/registration">LOGGED IN</a> TO DO THAT');
   } else {
     res.render("urls_new");
   }
-});
-
-app.get("/urls", (req, res) => {
-
-  let userId = req.session.userId;
-
-  if (!userId) {
-    res.status(400).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
-  } else {
-
-    log(urlDataBase)
-    res.render("urls_index");
-  }
-});
-
-app.post("/register", (req, res) => {
-  return createUser(req, res);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -152,11 +144,23 @@ app.get("/urls/:shortURL", (req, res) => {
 
   if (!validateUserLink(userId, shortURL, urlDataBase)) {
     res.send('THIS LINK IS NOT IN YOUR ACCOUNT. <a href="/registration">LOG IN</a> or GO BACK TO WHERE YOU CAME FROM');
-  };
+  }
 
   let longURL = urlDataBase[shortURL];
   let templateVars = { shortURL: shortURL, longURL: longURL, user: users[userId] };
   res.render("urls_show", templateVars);
+});
+
+app.get("/urls", (req, res) => {
+
+  let userId = req.session.userId;
+
+  if (!userId) {
+    res.status(401).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
+  } else {
+
+    res.render("urls_index");
+  }
 });
 
 app.post("/urls/:shortURL/update", (req, res) => {
@@ -167,7 +171,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
   if (!validateUserLink(userId, shortURL, urlDataBase)) {
 
-    res.status(400).send('THATS NOT YOUR LINK');
+    res.status(401).send('THATS NOT YOUR LINK');
 
   } else {
 
@@ -188,7 +192,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
     delete urlDataBase[shortURL];
     res.redirect("/urls");
-  };
+  }
 });
 
 app.post("/urls", (req, res) => {
@@ -197,7 +201,7 @@ app.post("/urls", (req, res) => {
 
   if (!userId) {
 
-    res.status(400).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
+    res.status(401).send('YOU MUST <a href="/registration">LOG IN</a> TO VIEW YOUR LITTLE LINKS');
 
   } else {
 
@@ -215,7 +219,7 @@ app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
 
   if (urlDataBase[shortURL] === undefined) {
-    res.status(400).send("THAT'S NOT EVEN A VALID LINK! <a href='/registration'>LOG IN</a> TO CREATE ONE THAT ACTUALLY WORKS!");
+    res.status(404).send("THAT'S NOT EVEN A VALID LINK! <a href='/registration'>LOG IN</a> TO CREATE ONE THAT ACTUALLY WORKS!");
 
   } else {
 
@@ -239,7 +243,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = { users };
-
-///TODO: Refactor error messages into variables
-// Check status codes
-//
