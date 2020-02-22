@@ -2,18 +2,31 @@
 
 ## Summary
 
-This repository is for TinyApp, a web app that shortens URL links into something more shareable.
+TinyApp, is a full-stack a web app that shortens URL links into something more shareable (like bit.ly).
 
-Made by [Altair Ioffe](https://github.com/altairioffe) as a project for [Lighthouse Labs](https://www.lighthouselabs.ca/)
+
+## Dependencies
+
+- Node.js
+- Express
+- EJS
+- bcrypt
+- body-parser
+- cookie-session
+
+## Getting Started
+
+- Install all dependencies (using the `npm install` command).
+- Run the development web server using the `node express_server.js` command.
 
 ## Contents
 
 * [express_server.js](/helpers.js): 
   * Main server-side code & routing using Node and Express
-  * Secure user authentication, encryption on cookies and user sessions using bcrypt
+  * Secure user authentication & encryption using bcrypt
 * [helpers.js](/helpers.js): 
   * Helper functions required by express_server.js
-  * Mainly used for user identification and authentication
+  * Mainly for user identification and authentication
 * [views](/views): 
   * Folder containing EJS Templates and Partials
   * Dynamically renders client-side using HTML, CSS, and Javascript, according to routing in express_server.js
@@ -24,10 +37,11 @@ Made by [Altair Ioffe](https://github.com/altairioffe) as a project for [Lightho
 
 * User accounts: 
   * Registration & login forms
-  * User-specific database containing saved links. Database can only be accessed or modified by account holder, but shortened URLs can be shared with anyone
+  * User-specific database containing saved links
+  * Saved links can only be modified or deleted by the creator's account, but short links, once created, may be shared with and used by anyone
   * Encrypted session with password hashing
   * Random-generated user ID for added security
-  * Logout buttpm in header
+  * Logout button in header
 
 * URL Shortnener: 
   * Takes input URL from user and auto-generates a short link which takes users to the same destination.

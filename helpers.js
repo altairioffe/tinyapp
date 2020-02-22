@@ -40,7 +40,6 @@ const authenticatePassword = function(validatedId, password, users) {
       if (result)  console.log('helper: ', result);
     })
     .catch((err) => console.log('authentication failed'))
-  //console.log(passwordsMatch);
 };
 
 

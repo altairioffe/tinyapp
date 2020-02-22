@@ -47,31 +47,7 @@ const users = {
   }
 };
 
-//HELPER FUNCTIONS:
-// const findUrlsForUserId = function(userId, urlDataBase) {
-
-//   let userLinks = {};
-
-//   for (let link in urlDataBase) {
-//     if (urlDataBase[link].userId === userId) {
-//       userLinks[link] = urlDataBase[link].longURL;
-//     }
-//   }
-//   return userLinks;
-// };
-// /////[EXPORT]
-// const validateUserLink = function(userId, shortlink, urlDataBase) {
-
-//   const userLinks = findUrlsForUserId(userId, urlDataBase);
-
-//   let usersMatch = false;
-
-//   for (let key in userLinks) {
-//     if (key === shortlink) {
-//       return usersMatch = true;
-//     }
-//   }
-// };
+//HELPER FUNCTION:
 
 const createUser = function(req, res) {
 
@@ -133,9 +109,6 @@ app.post("/login", (req, res) => {
 
     res.status(400).send('YOU ENTERED THE WRONG EMAIL OR PASSWORD... <a href="/registration">try again</a>');
   }
-
-  log('from post route: ', userId);
-
 });
 
 app.post("/logout", (req, res) => {
@@ -218,12 +191,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   };
 });
 
-
-
-
-
-
-
 app.post("/urls", (req, res) => {
 
   let userId = req.session.userId;
@@ -237,23 +204,15 @@ app.post("/urls", (req, res) => {
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
 
-
     urlDataBase[shortURL] = { 'longURL': longURL, 'userId': userId };
-
-   // log(urlDataBase)
 
     res.redirect("/urls");
   }
 });
 
-
-
-
-
 app.get("/u/:shortURL", (req, res) => {
 
   const shortURL = req.params.shortURL;
-  //log(urlDataBase[shortURL])
 
   if (urlDataBase[shortURL] === undefined) {
     res.status(400).send("THAT'S NOT EVEN A VALID LINK! <a href='/registration'>LOG IN</a> TO CREATE ONE THAT ACTUALLY WORKS!");
@@ -280,3 +239,7 @@ app.listen(PORT, () => {
 });
 
 module.exports = { users };
+
+///TODO: Refactor error messages into variables
+// Check status codes
+//
