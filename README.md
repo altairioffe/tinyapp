@@ -2,9 +2,9 @@
 
 ## Summary
 
-TinyApp, is a full-stack a web app that shortens URL links into something more shareable (like bit.ly).
+TinyApp, is a full-stack a web app that shortens URL links into something more shareable (similar to bit.ly).
 
-
+![LoginPage](images/loginPage.png)
 ## Dependencies
 
 - Node.js
@@ -32,6 +32,8 @@ TinyApp, is a full-stack a web app that shortens URL links into something more s
   * Dynamically renders client-side using HTML, CSS, and Javascript, according to routing in express_server.js
 * [test](/test): 
   * Folder containing Mocha & Chai testing suite
+
+![LoginPage](images/urlsList.png)
 
   ## Main Features
 
