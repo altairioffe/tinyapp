@@ -33,7 +33,7 @@ TinyApp, is a full-stack a web app that shortens URL links into something more s
 * [test](/test): 
   * Folder containing Mocha & Chai testing suite
 
-![LoginPage](images/urlsList.png)
+![URLList](images/urlsList.png)
 
   ## Main Features
 
